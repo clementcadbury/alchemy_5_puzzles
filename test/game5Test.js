@@ -11,9 +11,24 @@ describe('Game5', function () {
   it('should be a winner', async function () {
     const { game } = await loadFixture(deployContractAndSetVariables);
 
-    // good luck
+    let wallet;
+    
+  
+      while (!await game.isWon() ) {
+        wallet = ethers.Wallet.createRandom();
+        wallet = wallet.connect(ethers.provider);
+        await ethers.provider.send("hardhat_setBalance", [
+          await wallet.getAddress(),
+          "0x1000000000000000000",
+        ]);
+        console.log(await wallet.getAddress());
+        try{
+          await game.connect(wallet).win();
+        } catch{}
+      }
 
-    await game.win();
+
+    //await game.connect(wallet).win();
 
     // leave this assertion as-is
     assert(await game.isWon(), 'You did not win the game');
